@@ -1,0 +1,166 @@
+#Database
+  XML Code
+
+  <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/inputName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Name"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/btnAdd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Data"
+        android:layout_marginTop="8dp" />
+
+    <Button
+        android:id="@+id/btnShow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Data"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/outputText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="16sp" />
+
+</LinearLayout>
+
+JAVA CODE
+
+package com.mc.dbex;
+
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    DBHelper dbHelper; // Database helper instance
+    EditText inputName; // Input field for user data
+    TextView outputText; // TextView for displaying database content
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize database helper
+        dbHelper = new DBHelper(this);
+
+        // UI Components
+        inputName = findViewById(R.id.inputName);
+        Button btnAdd = findViewById(R.id.btnAdd);
+        Button btnShow = findViewById(R.id.btnShow);
+        outputText = findViewById(R.id.outputText);
+
+        // Set padding for edge-to-edge UI
+        View mainView = findViewById(R.id.main);
+        ViewCompat.setOnApplyWindowInsetsListener(mainView, (view, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        // Add data to database
+        btnAdd.setOnClickListener(v -> {
+            String name = inputName.getText().toString().trim();
+            if (!name.isEmpty()) {
+                boolean isInserted = dbHelper.insertData(name);
+                if (isInserted) {
+                    Toast.makeText(this, "Data Added", Toast.LENGTH_SHORT).show();
+                    inputName.setText(""); // Clear input
+                } else {
+                    Toast.makeText(this, "Error Adding Data", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Enter a Name", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Show data from database
+        btnShow.setOnClickListener(v -> {
+            Cursor cursor = dbHelper.getData();
+            if (cursor.getCount() == 0) {
+                outputText.setText("No data found.");
+                return;
+            }
+
+            StringBuilder data = new StringBuilder();
+            while (cursor.moveToNext()) {
+                data.append("ID: ").append(cursor.getInt(0))
+                        .append(", Name: ").append(cursor.getString(1)).append("\n");
+            }
+            outputText.setText(data.toString());
+        });
+    }
+}
+
+
+DBHelper
+
+package com.mc.dbex;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DBHelper extends SQLiteOpenHelper {
+
+    private static final String DATABASE_NAME = "UserData.db";
+    private static final String TABLE_NAME = "users";
+    private static final String COL_ID = "id";
+    private static final String COL_NAME = "name";
+
+    public DBHelper(Context context) {
+        super(context, DATABASE_NAME, null, 1);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_NAME + " TEXT)");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+
+    public boolean insertData(String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_NAME, name);
+        long result = db.insert(TABLE_NAME, null, values);
+        return result != -1; // True if insertion was successful
+    }
+
+    public Cursor getData() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+    }
+}
