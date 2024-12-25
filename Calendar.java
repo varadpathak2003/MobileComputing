@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         CalendarView calendarView=findViewById(R.id.calendarView);
         TextView result=findViewById(R.id.resultTextView);
-        calendarView.setOnDateChangeListener((view,date,month,year)->{
+        calendarView.setOnDateChangeListener((view,year,month,date)->{
             String dob=date+"/"+month+"/"+year;
             result.setText("Your Date of Birth: " +dob);
         });
