@@ -29,3 +29,48 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 }
+/*<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <!-- EditText -->
+    <EditText
+        android:id ="@+id/tempInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter Temperature"
+        android:inputType="numberDecimal"   />
+    <RadioGroup
+        android:id="@+id/tempType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/celsius"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Celsius" />
+
+        <RadioButton
+            android:id="@+id/fahrenheit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fahrenheit" />
+
+    </RadioGroup>
+    <Button
+        android:id="@+id/submitButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Convert"
+        />
+    <TextView
+        android:id="@+id/result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
+*/
